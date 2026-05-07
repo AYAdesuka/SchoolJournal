@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<nav class="navbar">
+    <div class="navbar-left">
+        <a href="{% url 'home' %}" class="logo">SchoolJournal</a>
+    </div>
 
-</body>
-</html>
+    <div class="navbar-right">
+        <a href="{% url 'home' %}">Главная</a>
+        <a href="">Классы</a>
+        <a href="#">Ученики</a>
+        <a href="#">Журнал</a>
+        <a href="#">Войти</a>
+    </div>
+</nav>
