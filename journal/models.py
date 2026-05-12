@@ -3,9 +3,15 @@ from django.db import models
 
 # Create your models here.
 
-
 class Person(models.Model):
+    PERSON_STATUS = [
+        ('учитель', 'Учитель'),
+        ('студент', 'Студент'),
+        ('админ', 'Админ'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='person')
+    role = models.CharField(max_length=20, choices=PERSON_STATUS, default="student")
     last_name = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, blank=True, null=True)
@@ -24,10 +30,10 @@ class Person(models.Model):
 
 class ParentRelation(models.Model):
     RELATION_CHOICES = [
-        ('mother', 'Mother'),
-        ('father', 'Father'),
-        ('guardian', 'Guardian'),
-        ('other', 'Other'),
+        ('мама', 'Мама'),
+        ('папа', 'Папа'),
+        ('опекун', 'Опекун'),
+        ('Другое', 'Другое'),
     ]
 
     child_person = models.ForeignKey(
@@ -68,6 +74,7 @@ class SchoolClass(models.Model):
         blank=True,
         related_name='class_teacher_classes'
     )
+    #if Person.objects.filter(role='учитель')
     room_number = models.CharField(max_length=10, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
