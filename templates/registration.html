@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="register-card">
+        <h1>Регистрация</h1>
+        <p>Создайте аккаунт, чтобы пользоваться журналом.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="">Логин</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="">Email</label>
+                {{ form.email }}
+            </div>
+
+            <div class="form-group">
+                <label for="">Пароль</label>
+                {{ form.password1 }}
+            </div>
+
+            <div class="form-group">
+                <label for="">Повтор пароля</label>
+                {{ form.password2 }}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </form>
+
+        <div class="bottom-link">
+            Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
