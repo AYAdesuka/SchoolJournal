@@ -9,11 +9,11 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('applications')
+            return redirect('home')
     else:
         form = RegistrationForm()
 
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'registration.html', {'form': form})
 
 
 def login_view(request):
