@@ -1,13 +1,34 @@
 <nav class="navbar">
     <div class="navbar-left">
-        <a href="{% url 'home' %}" class="logo">SchoolJournal</a>
+        <a href="{% url 'main:home' %}" class="logo">SchoolJournal</a>
     </div>
 
     <div class="navbar-right">
-        <a href="{% url 'home' %}">Главная</a>
-        <a href="">Классы</a>
-        <a href="#">Ученики</a>
-        <a href="#">Журнал</a>
-        <a href="{% url 'login' %}">Войти</a>
+        <div class="flex-display">
+            <a href="{% url 'main:home' %}">Главная</a>
+            <a href="#">Классы</a>
+            <a href="#">Ученики</a>
+            <a href="#">Журнал</a>
+        </div>
+
+        <div class="flex-display4auth">
+            {% if user.is_authenticated %}
+                <div class="user-menu">
+                    <a href="#" class="user-badge">
+                        <span class="user-avatar">{{ user.username|slice:":1"|upper }}</span>
+                        <span class="user-name">{{ user.username }}</span>
+                    </a>
+
+                    <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-btn">Выйти</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="auth-menu">
+                    <a href="{% url 'accounts:login' %}" class="auth-link">Войти</a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </nav>

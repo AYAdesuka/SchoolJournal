@@ -34,10 +34,14 @@ body {
     color: #1f2937;
 }
 
-.navbar-right a {
-    margin-left: 16px;
+.navbar-right {
+    display: flex;
     text-decoration: none;
     color: #374151;
+}
+
+.navbar-right a{
+    margin-left: 5px;
 }
 
 .navbar-right a:hover {
@@ -138,6 +142,10 @@ body {
 
 .login-container button:hover {
     background-color: #2980b9;
+}
+
+.flex-display4auth{
+    margin-left: 5px;
 }
 
 .register-link {
@@ -241,3 +249,4 @@ body {
     margin-bottom: 10px;
     padding-left: 18px;
 }
+

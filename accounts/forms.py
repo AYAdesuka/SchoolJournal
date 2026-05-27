@@ -11,7 +11,7 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'full_name', 'phone', 'email', 'password1', 'password2')
+        fields = ('username', 'full_name', 'phone', 'email', 'password1', 'password2',)
         labels = {
            'username': 'Логин'
         }
