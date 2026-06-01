@@ -17,7 +17,7 @@
                 <span class="avatar-big">{{ user.username|slice:":1"|upper }}</span>
             </div>
             <h2>{{ user.username }}</h2>
-            <p class="user-role">Учитель / Администратор</p>
+            <p class="user-role">{{ user.role }}</p>
 
             <div class="profile-actions">
                 <a href="#" class="btn-secondary">Изменить фото</a>

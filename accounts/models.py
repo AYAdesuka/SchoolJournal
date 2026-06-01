@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
         ('админ', 'Админ'),
     ]
 
-    role = models.CharField(max_length=20, choices=PERSON_STATUS, default="student")
+    role = models.CharField(max_length=20, choices=PERSON_STATUS, default="студент")
     last_name = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, blank=True, null=True)

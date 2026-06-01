@@ -32,5 +32,6 @@ def my_profile(request):
     user = request.user
     context = {
         'user': user,
+        'role': user.role,
     }
     return render(request, 'my_profile.html', context)

@@ -2,6 +2,8 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from faker import Faker
+fake = Faker('ru_RU')
 
 
 def main():
