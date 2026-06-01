@@ -1,33 +1,25 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
+from accounts.models import CustomUser
 
 # Create your models here.
 
-class Person(models.Model):
-    PERSON_STATUS = [
-        ('учитель', 'Учитель'),
-        ('студент', 'Студент'),
-        ('админ', 'Админ'),
-    ]
-
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='person')
-    role = models.CharField(max_length=20, choices=PERSON_STATUS, default="student")
-    last_name = models.CharField(max_length=50)
-    first_name = models.CharField(max_length=50)
-    middle_name = models.CharField(max_length=50, blank=True, null=True)
-    birth_date = models.DateField(blank=True, null=True)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
+class SchoolPeriod(models.Model):
+    period_name = models.CharField(max_length=50)
+    academic_year = models.CharField(max_length=9)
+    period_number = models.PositiveSmallIntegerField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_current = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.last_name} {self.first_name}'
+        return f'{self.period_name} {self.academic_year}'
 
     class Meta:
-        ordering = ['last_name', 'first_name']
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-
+        ordering = ['period_name', 'academic_year']
+        verbose_name = 'Учебный период'
+        verbose_name_plural = 'Учебный период'
 
 class ParentRelation(models.Model):
     RELATION_CHOICES = [
@@ -38,12 +30,12 @@ class ParentRelation(models.Model):
     ]
 
     child_person = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='child_relations'
     )
     parent_person = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='parent_relations'
     )
@@ -67,9 +59,17 @@ class SchoolClass(models.Model):
     ]
 
     class_name = models.CharField(max_length=20, unique=True)
-    academic_year = models.CharField(max_length=9)
+    academic_year = models.ForeignKey(
+        SchoolPeriod,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='class_academic_year',
+        db_column='academic_year',
+    )
+
     class_teacher = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -92,7 +92,7 @@ class SchoolClass(models.Model):
 
 class Enrollment(models.Model):
     student = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='enrollments'
     )
@@ -152,7 +152,7 @@ class Schedule(models.Model):
         related_name='schedules'
     )
     teacher = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='teacher_schedules'
     )
@@ -171,24 +171,6 @@ class Schedule(models.Model):
         verbose_name_plural = 'Расписания'
 
 
-
-class SchoolPeriod(models.Model):
-    period_name = models.CharField(max_length=50)
-    academic_year = models.CharField(max_length=9)
-    period_number = models.PositiveSmallIntegerField()
-    start_date = models.DateField()
-    end_date = models.DateField()
-    is_current = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f'{self.period_name} {self.academic_year}'
-
-    class Meta:
-        ordering = ['period_name', 'academic_year']
-        verbose_name = 'Учебный период'
-        verbose_name_plural = 'Учебный период'
-
-
 class GradeBook(models.Model):
     school_class = models.ForeignKey(
         SchoolClass,
@@ -201,7 +183,7 @@ class GradeBook(models.Model):
         related_name='gradebooks'
     )
     teacher = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='gradebooks'
     )
@@ -235,7 +217,7 @@ class Grade(models.Model):
         related_name='grades'
     )
     student = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='grades'
     )
@@ -268,7 +250,7 @@ class Attendance(models.Model):
         related_name='attendance_records'
     )
     student = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='attendance_records'
     )
@@ -294,7 +276,7 @@ class FinalGrade(models.Model):
     ]
 
     student = models.ForeignKey(
-        Person,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='final_grades'
     )

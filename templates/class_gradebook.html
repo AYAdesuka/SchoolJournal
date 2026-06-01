@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="gradebook-container">
+
+    <div class="gradebook-header">
+        <h1>Журнал класса {{ school_class.class_name }}</h1>
+        <p>Учебный год: {{ school_class.academic_year }}</p>
+        <p>Классный руководитель: {{ school_class.class_teacher }}</p>
+    </div>
+
+    <div class="gradebook-grid">
+        <a href="{% url 'main:class_subjects' school_class.id %}" class="gradebook-card">📚 Предметы</a>
+        <a href="{% url 'main:class_teachers' school_class.id %}" class="gradebook-card">🧑‍🏫 Учителя</a>
+        <a href="{% url 'main:class_grades' school_class.id %}" class="gradebook-card">📝 Оценки</a>
+        <a href="{% url 'main:class_attendance' school_class.id %}" class="gradebook-card">📅 Посещаемость</a>
+        <a href="{% url 'main:class_stats' school_class.id %}" class="gradebook-card">📊 Статистика</a>
+        <a href="{% url 'main:class_homework' school_class.id %}" class="gradebook-card">📖 Домашние задания</a>
+        <a href="{% url 'main:class_docs' school_class.id %}" class="gradebook-card">📎 Документы</a>
+        <a href="{% url 'main:class_settings' school_class.id %}" class="gradebook-card">⚙️ Настройки</a>
+    </div>
+
+</div>
+
+{% endblock %}

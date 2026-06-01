@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Электронный журнал{% endblock %}
+
+{% block content %}
+<div class="journal-page">
+
+    <div class="journal-top">
+        <div>
+            <h1>Электронный журнал</h1>
+            <p>Добро пожаловать, {{ user.username }}</p>
+        </div>
+    </div>
+
+    <div class="class-selector-block">
+        <h2>Мои классы</h2>
+
+        <div class="class-grid">
+            {% for school_class in classes %}
+                <a class="class-card"
+                   href="{% url 'main:class_gradebook' school_class.id %}">
+                    <span>{{ school_class.class_name }}</span>
+                </a>
+            {% empty %}
+                <p>У вас нет закреплённых классов.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -27,3 +27,10 @@ def login_view(request):
         form = LoginForm()
 
     return render(request, 'login.html', {'form': form})
+
+def my_profile(request):
+    user = request.user
+    context = {
+        'user': user,
+    }
+    return render(request, 'my_profile.html', context)

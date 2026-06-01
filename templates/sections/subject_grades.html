@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="section-container">
+
+    <div class="journal-header">
+        <h1>{{ subject.subject_name }}</h1>
+        <h3>Класс: {{ school_class.class_name }}</h3>
+    </div>
+
+    <div class="journal-actions">
+        <button type="button">Добавить урок</button>
+        <button type="button">Статистика</button>
+    </div>
+
+    <div class="section-card">
+
+        <table class="journal-table">
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="class-selector-block">
+
+    <h2>📚 Предметы класса {{ school_class.class_name }}</h2>
+
+    <div class="class-grid">
+
+        {% for gradebook in gradebooks %}
+            <a href="{% url 'main:subject_grades' school_class.id gradebook.subject.id %}"
+               class="class-card">
+                {{ gradebook.subject.subject_name }}
+            </a>
+        {% empty %}
+            <p>Предметов пока нет</p>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}  <!-- Если у тебя есть base.html, иначе удали эту строку -->
+
+{% block title %}Мой профиль - SchoolJournal{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Мой профиль</h1>
+    </div>
+
+    <div class="profile-container">
+
+        <div class="profile-sidebar">
+            <div class="profile-avatar">
+                <span class="avatar-big">{{ user.username|slice:":1"|upper }}</span>
+            </div>
+            <h2>{{ user.username }}</h2>
+            <p class="user-role">Учитель / Администратор</p>
+
+            <div class="profile-actions">
+                <a href="#" class="btn-secondary">Изменить фото</a>
+            </div>
+        </div>
+
+        <div class="profile-main">
+
+            <div class="profile-card">
+                <h3>Личная информация</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Имя пользователя:</span>
+                        <span class="value">{{ user.username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Email:</span>
+                        <span class="value">{{ user.email|default:"Не указан" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Дата регистрации:</span>
+                        <span class="value">{{ user.date_joined|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Статус:</span>
+                        <span class="value status-active">Активен</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <h3>Настройки аккаунта</h3>
+                <a href="#" class="btn-link">
+                    Изменить пароль
+                </a>
+                <a href="#" class="btn-link">Настройки уведомлений</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

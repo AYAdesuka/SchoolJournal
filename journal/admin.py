@@ -1,15 +1,6 @@
 from django.contrib import admin
 from .models import *
 
-
-@admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
-    list_display = ('user', 'last_name', 'first_name', 'middle_name')
-    search_fields = ('user__username', 'last_name', 'first_name', 'middle_name')
-    list_filter = ('user__is_active',)
-    ordering = ('last_name', 'first_name')
-
-
 @admin.register(ParentRelation)
 class ParentRelationAdmin(admin.ModelAdmin):
     list_display = ('child_person', 'parent_person', 'relationship')
