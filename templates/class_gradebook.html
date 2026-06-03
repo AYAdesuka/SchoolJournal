@@ -2,25 +2,138 @@
 
 {% block content %}
 
-<div class="gradebook-container">
+<h1>Журнал: {{ school_class.class_name }}</h1>
 
-    <div class="gradebook-header">
-        <h1>Журнал класса {{ school_class.class_name }}</h1>
-        <p>Учебный год: {{ school_class.academic_year }}</p>
-        <p>Классный руководитель: {{ school_class.class_teacher }}</p>
-    </div>
+<div class="table-wrap">
 
-    <div class="gradebook-grid">
-        <a href="{% url 'main:class_subjects' school_class.id %}" class="gradebook-card">📚 Предметы</a>
-        <a href="{% url 'main:class_teachers' school_class.id %}" class="gradebook-card">🧑‍🏫 Учителя</a>
-        <a href="{% url 'main:class_grades' school_class.id %}" class="gradebook-card">📝 Оценки</a>
-        <a href="{% url 'main:class_attendance' school_class.id %}" class="gradebook-card">📅 Посещаемость</a>
-        <a href="{% url 'main:class_stats' school_class.id %}" class="gradebook-card">📊 Статистика</a>
-        <a href="{% url 'main:class_homework' school_class.id %}" class="gradebook-card">📖 Домашние задания</a>
-        <a href="{% url 'main:class_docs' school_class.id %}" class="gradebook-card">📎 Документы</a>
-        <a href="{% url 'main:class_settings' school_class.id %}" class="gradebook-card">⚙️ Настройки</a>
-    </div>
+<table class="grade-table">
+
+    <thead>
+        <tr>
+            <th>Ученик</th>
+            {% for lesson in lessons %}
+                <th>
+                    {{ lesson.subject.subject_name }}<br>
+                    {{ lesson.lesson_date|date:"d.m" }}
+                </th>
+            {% endfor %}
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for enrollment in enrollments %}
+            <tr>
+                <td>
+                    {{ enrollment.student.last_name }}
+                    {{ enrollment.student.first_name }}
+                </td>
+
+                {% for lesson in lessons %}
+                    <td>
+
+                        <form method="post" action="{% url 'main:update_grade' %}">
+                            {% csrf_token %}
+
+                            <input type="hidden" name="student_id" value="{{ enrollment.student.id }}">
+                            <input type="hidden" name="gradebook_id" value="{{ lesson.id }}">
+
+                            <select name="grade_value" onchange="this.form.submit()" class="grade-select">
+
+                                <option value="">-</option>
+
+                                {% for g in grades %}
+                                    <option value="{{ g }}"
+                                        {% if grade_map.enrollment.student.id|add:"_"|add:lesson.id == g|stringformat:"s" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ g }}
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+
+                        </form>
+
+                    </td>
+                {% endfor %}
+
+            </tr>
+        {% endfor %}
+
+    </tbody>
+
+</table>
 
 </div>
+
+
+<style>
+
+.table-wrap {
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.grade-table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.grade-table th,
+.grade-table td {
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.grade-table th {
+    background: #f5f5f5;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    font-weight: 600;
+}
+
+.grade-table th:first-child,
+.grade-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: #fff;
+    z-index: 6;
+    text-align: left;
+}
+
+.grade-table tbody tr:hover td {
+    background: #f0f7ff;
+    transition: 0.15s;
+}
+
+.grade-select {
+    padding: 3px 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background: #fff;
+    cursor: pointer;
+    min-width: 40px;
+    text-align: center;
+}
+
+.grade-table button {
+    display: none;
+}
+
+.grade-5 { background: #d4f8d4; color: #1e7d1e; }
+.grade-4 { background: #e7f0ff; color: #1d4ed8; }
+.grade-3 { background: #fff6d6; color: #a16207; }
+.grade-2 { background: #ffe1e1; color: #b91c1c; }
+
+</style>
 
 {% endblock %}

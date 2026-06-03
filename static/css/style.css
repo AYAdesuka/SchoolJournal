@@ -659,49 +659,35 @@ body {
 
 /* class_gradebook */
 
-.gradebook-container {
-    padding: 20px;
+.table-wrapper {
+    overflow-x: auto;
 }
 
-.gradebook-header {
-    margin-bottom: 25px;
+.grade-table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+    background: white;
 }
 
-.gradebook-header h1 {
-    margin-bottom: 10px;
+.grade-table th,
+.grade-table td {
+    border: 1px solid #ddd;
+    padding: 6px;
+    text-align: center;
 }
 
-.gradebook-header p {
-    margin: 2px 0;
-    opacity: 0.7;
+.grade-table th {
+    background: #f3f3f3;
+    position: sticky;
+    top: 0;
 }
 
-.gradebook-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-}
-
-.gradebook-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 120px;
-
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-
-    text-decoration: none;
-    color: inherit;
-
-    font-weight: 600;
-
-    transition: 0.2s;
-}
-
-.gradebook-card:hover {
-    transform: translateY(-4px);
+.student-cell {
+    position: sticky;
+    left: 0;
+    background: #fafafa;
+    font-weight: bold;
 }
 
 /* subject */
