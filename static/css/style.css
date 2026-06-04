@@ -272,7 +272,6 @@ body {
 .footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 40px;
     padding: 16px 24px;
     background: #231f20;
     border-top: 1px solid #e5e7eb;
@@ -658,37 +657,6 @@ body {
 }
 
 /* class_gradebook */
-
-.table-wrapper {
-    overflow-x: auto;
-}
-
-.grade-table {
-    border-collapse: collapse;
-    width: max-content;
-    min-width: 100%;
-    background: white;
-}
-
-.grade-table th,
-.grade-table td {
-    border: 1px solid #ddd;
-    padding: 6px;
-    text-align: center;
-}
-
-.grade-table th {
-    background: #f3f3f3;
-    position: sticky;
-    top: 0;
-}
-
-.student-cell {
-    position: sticky;
-    left: 0;
-    background: #fafafa;
-    font-weight: bold;
-}
 
 /* subject */
 

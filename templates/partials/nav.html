@@ -8,9 +8,10 @@
         <div class="navbar-center">
             <div class="flex-display">
                 <a href="{% url 'main:home' %}">Главная</a>
-                <a href="#">Классы</a>
-                <a href="#">Ученики</a>
+
+                <a href="{% url 'main:schedule' %}">Расписание</a>
                 <a href="{% url 'main:gradebook' %}">Журнал</a>
+
             </div>
         </div>
 

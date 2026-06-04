@@ -1,139 +1,447 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<h1>Журнал: {{ school_class.class_name }}</h1>
+<div class="journal-layout">
 
-<div class="table-wrap">
+    <aside class="journal-sidebar">
+        <div class="sidebar-top">
+            <div class="logo">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Журнал</span>
+            </div>
+        </div>
 
-<table class="grade-table">
+        <nav class="sidebar-menu">
+            <a href="{% url 'main:gradebook' %}" class="menu-item {% if 'gradebook' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-users"></i>
+                <span>Мой класс</span>
+            </a>
 
-    <thead>
-        <tr>
-            <th>Ученик</th>
-            {% for lesson in lessons %}
-                <th>
-                    {{ lesson.subject.subject_name }}<br>
-                    {{ lesson.lesson_date|date:"d.m" }}
-                </th>
-            {% endfor %}
-        </tr>
-    </thead>
+            {% if school_class %}
+                <a href="{% url 'main:class_schedule' school_class.id %}" class="menu-item {% if 'schedule' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Расписание</span>
+                </a>
 
-    <tbody>
+                {% if request.user.role == 'teacher' or request.user.role == 'учитель' %}
+                    <a href="{% url 'main:class_settings' school_class.id %}" class="menu-item {% if 'settings' in request.path %}active{% endif %}">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Настройки</span>
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'main:schedule' %}" class="menu-item">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Расписание</span>
+                </a>
+            {% endif %}
+        </nav>
 
-        {% for enrollment in enrollments %}
-            <tr>
-                <td>
-                    {{ enrollment.student.last_name }}
-                    {{ enrollment.student.first_name }}
-                </td>
+        <div class="sidebar-profile">
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div class="profile-info">
+                <span class="profile-name">{{ request.user.last_name }} {{ request.user.first_name|slice:":1" }}.</span>
+                <span class="profile-role">
+                    {% if request.user.role == 'teacher' or request.user.role == 'учитель' %}Учитель{% else %}Ученик{% endif %}
+                </span>
+            </div>
+        </div>
+    </aside>
 
-                {% for lesson in lessons %}
-                    <td>
+    <main class="journal-main-content">
 
-                        <form method="post" action="{% url 'main:update_grade' %}">
-                            {% csrf_token %}
+        <div class="journal-header">
+            <div class="header-info">
+                <h1>{% if school_class %}{{ school_class.class_name }} класс{% else %}Класс не выбран{% endif %} / Электронный журнал</h1>
 
-                            <input type="hidden" name="student_id" value="{{ enrollment.student.id }}">
-                            <input type="hidden" name="gradebook_id" value="{{ lesson.id }}">
+                <div class="class-selector">
+                    <label for="class-select">Выбрать класс:</label>
+                    {% if request.user.role == 'teacher' or request.user.role == 'учитель' or request.user.is_superuser %}
+                        <select id="class-select" onchange="if(this.value) window.location.href=this.value;">
+                            {% if not school_class %}<option value="" disabled selected>Выберите класс</option>{% endif %}
+                            {% for c in my_classes %}
+                                <option value="{% url 'main:class_gradebook' c.id %}"
+                                        {% if school_class and c.id == school_class.id %}selected{% endif %}>
+                                    {{ c.class_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <select id="class-select" disabled style="background: #f1f5f9; cursor: not-allowed; opacity: 0.8;">
+                            <option selected>{{ school_class.class_name }}</option>
+                        </select>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-                            <select name="grade_value" onchange="this.form.submit()" class="grade-select">
+        <div class="table-wrap">
+            <table class="grade-table">
+                <thead>
+                    <tr>
+                        <th class="sticky-student-column">
+                            <div class="student-header-cell">
+                                <span class="hdr-num">№</span>
+                                <span class="hdr-name">ФИО ученика</span>
+                            </div>
+                        </th>
 
-                                <option value="">-</option>
+                        {% for lesson in lessons %}
+                            <th class="date-column-header">
+                                <span class="subject-title">{{ lesson.subject.subject_name }}</span>
+                                <span class="lesson-date">{{ lesson.lesson_date|date:"d.m" }}</span>
+                            </th>
+                        {% empty %}
+                            <th style="padding: 20px; color: #94a3b8;">Уроков не найдено</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrollments %}
+                        <tr>
+                            <td class="sticky-student-column">
+                                <div class="student-data-cell">
+                                    <span class="cell-number">{{ forloop.counter }}</span>
+                                    <span class="avatar">{{ enrollment.student.last_name|slice:":1" }}</span>
+                                    <span class="name-text">{{ enrollment.student.last_name }} {{ enrollment.student.first_name }}</span>
+                                </div>
+                            </td>
 
-                                {% for g in grades %}
-                                    <option value="{{ g }}"
-                                        {% if grade_map.enrollment.student.id|add:"_"|add:lesson.id == g|stringformat:"s" %}
-                                            selected
-                                        {% endif %}
-                                    >
-                                        {{ g }}
-                                    </option>
-                                {% endfor %}
+                            {% for lesson in lessons %}
+                                <td class="grade-cell">
+                                    {# Формируем строковый ключ для поиска в grade_map (напр. "5_12") #}
+                                    {% with student_id=enrollment.student.id|stringformat:"s" lesson_id=lesson.id|stringformat:"s" %}
+                                        {% with key=student_id|add:"_"|add:lesson_id %}
+                                            {% with current_cell_grade=grade_map|get_item:key %}
 
-                            </select>
+                                                {% if request.user.role == 'teacher' or request.user.role == 'учитель' %}
+                                                    <form method="post" action="{% url 'main:safe_grade' %}" style="margin: 0;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="student_id" value="{{ enrollment.student.id }}">
+                                                        <input type="hidden" name="gradebook_id" value="{{ lesson.id }}">
 
-                        </form>
+                                                        <select name="grade_value" onchange="this.form.submit()" class="grade-select" data-grade="{{ current_cell_grade }}">
+                                                            <option value="">-</option>
+                                                            {% for g in grades %}
+                                                                <option value="{{ g }}" {% if current_cell_grade == g %}selected{% endif %}>
+                                                                    {{ g }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </form>
+                                                {% else %}
+                                                    <span class="grade-badge" data-grade="{{ current_cell_grade }}">
+                                                        {{ current_cell_grade|default:"—" }}
+                                                    </span>
+                                                {% endif %}
 
-                    </td>
-                {% endfor %}
+                                            {% endwith %}
+                                        {% endwith %}
+                                    {% endwith %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="100" style="padding: 20px;">Нет данных о зачислениях</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-            </tr>
-        {% endfor %}
+        <div class="table-summary-bar">
+            <div class="summary-item">
+                <span>Ученики: <strong>{{ enrollments.count }}</strong></span>
+            </div>
 
-    </tbody>
+            <div class="summary-item summary-item-highlight">
+                <span>Средний балл: <strong>{{ avg_grade|default:"0" }}</strong></span>
+            </div>
 
-</table>
+            <div class="summary-item">
+                <span>Пропуски (Н): <strong>{{ absences|default:"0" }}</strong></span>
+            </div>
 
+            <div class="summary-item" style="margin-left: auto; opacity: 0.6;">
+                <span>Обновлено: <strong>{% now "H:i" %}</strong></span>
+            </div>
+        </div>
+
+    </main>
 </div>
 
-
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.table-summary-bar {
+    display: flex;
+    gap: 40px;
+    background: #f8fafc;
+    padding: 16px 24px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    align-items: center;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+}
+
+.summary-item span {
+    letter-spacing: 0.02em;
+    color: #000;
+}
+
+.summary-item strong {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+    margin-left: 6px;
+    padding: 2px 8px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+
+.summary-item-highlight strong {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #b45309;
+}
+
+/* Скроллбар для всей страницы, если контента много */
+.journal-main-content::-webkit-scrollbar {
+    width: 6px;
+}
+.journal-main-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+/* Общие стили макета */
+.header-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
+.class-selector label { font-size: 16px; color: #000; margin-right: 8px; }
+.class-selector select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.journal-layout {
+    display: flex;
+    align-items: stretch;
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    min-height: 85vh;
+    overflow: hidden;
+    margin: 10px 0 0 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.journal-sidebar {
+    width: 230px;
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.sidebar-top { padding: 20px; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: #0f172a; }
+.logo i { color: #475569; font-size: 20px; }
+
+.sidebar-menu { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; flex-grow: 1; }
+.menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: #64748b; text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 6px; transition: all 0.15s; }
+.menu-item i { font-size: 16px; width: 18px; text-align: center; }
+.menu-item:hover { background: #f1f5f9; color: #0f172a; }
+.menu-item.active { background: #475569; color: #ffffff; font-weight: 600; }
+
+.sidebar-profile { padding: 14px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; background: #f1f5f9; }
+.profile-avatar { width: 34px; height: 34px; background: #cbd5e1; color: #475569; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.profile-info { display: flex; flex-direction: column; }
+.profile-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+.profile-role { font-size: 11px; color: #64748b; }
+
+.journal-main-content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.journal-header { margin-bottom: 20px; }
+.journal-header h1 { font-size: 20px; font-weight: 700; color: #0f172a; margin: 0; }
 
 .table-wrap {
     overflow-x: auto;
-    padding: 10px 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
 }
 
 .grade-table {
     border-collapse: collapse;
     width: max-content;
     min-width: 100%;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-size: 13px;
+    margin: 0;
 }
 
-.grade-table th,
-.grade-table td {
-    border: 1px solid #ddd;
-    padding: 6px 8px;
+.grade-table th, .grade-table td {
+    padding: 10px 14px;
     text-align: center;
-    white-space: nowrap;
+    vertical-align: middle;
+    box-sizing: border-box;
+    border-bottom: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
 }
 
-.grade-table th {
-    background: #f5f5f5;
-    position: sticky;
+.date-column-header { background: #f8fafc; font-weight: 600; color: #475569; }
+.subject-title { display: block; font-size: 11px; color: #64748b; font-weight: 500; text-transform: uppercase; }
+.lesson-date { display: block; font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px; }
+
+.sticky-student-column {
+    position: sticky !important;
+    left: 0 !important;
+    background: #ffffff !important;
+    z-index: 40 !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    padding: 10px 16px !important;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.06);
+}
+
+.sticky-student-column::before {
+    content: "";
+    position: absolute;
     top: 0;
-    z-index: 5;
-    font-weight: 600;
+    left: -2px;
+    width: 2px;
+    height: 100%;
+    background: #ffffff;
 }
 
-.grade-table th:first-child,
-.grade-table td:first-child {
-    position: sticky;
-    left: 0;
-    background: #fff;
-    z-index: 6;
+th.sticky-student-column {
+    z-index: 50 !important;
+    background: #f1f5f9 !important;
+}
+th.sticky-student-column::before { background: #f1f5f9; }
+
+.student-header-cell {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+}
+
+.student-data-cell {
+    display: flex;
+    align-items: center;
     text-align: left;
+    width: 100%;
 }
 
-.grade-table tbody tr:hover td {
-    background: #f0f7ff;
-    transition: 0.15s;
+.hdr-num, .cell-number { width: 25px; flex-shrink: 0; }
+.cell-number { color: #94a3b8; font-weight: 500; }
+.hdr-name { margin-left: 10px; }
+
+.avatar {
+    width: 24px; height: 24px; background: #e2e8f0; color: #475569;
+    font-weight: 600; font-size: 11px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 10px; flex-shrink: 0;
+}
+
+.name-text {
+    font-weight: 500; color: #334155;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.grade-table tbody tr:hover td { background: #f8fafc !important; }
+.grade-table tbody tr:hover .sticky-student-column { background: #f8fafc !important; }
+
+.grade-select, .grade-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
 }
 
 .grade-select {
-    padding: 3px 6px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    background: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid #e2e8f0;
+    background: #ffffff;
     cursor: pointer;
-    min-width: 40px;
-    text-align: center;
+    text-align-last: center;
+    outline: none;
+    color: #ffffff;
 }
 
-.grade-table button {
-    display: none;
+.grade-select:hover, .grade-select:focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 3px rgb(255, 255, 255);
+    transform: translateY(-1px);
 }
 
-.grade-5 { background: #d4f8d4; color: #1e7d1e; }
-.grade-4 { background: #e7f0ff; color: #1d4ed8; }
-.grade-3 { background: #fff6d6; color: #a16207; }
-.grade-2 { background: #ffe1e1; color: #b91c1c; }
+.grade-select[data-grade="5"], .grade-badge[data-grade="5"] { background: #dcfce7 !important; color: #15803d !important; border-color: #bbf7d0 !important; }
+.grade-select[data-grade="4"], .grade-badge[data-grade="4"] { background: #dbeafe !important; color: #1d4ed8 !important; border-color: #bfdbfe !important; }
+.grade-select[data-grade="3"], .grade-badge[data-grade="3"] { background: #fef3c7 !important; color: #b45309 !important; border-color: #fde68a !important; }
+.grade-select[data-grade="2"], .grade-badge[data-grade="2"] { background: #fee2e2 !important; color: #b91c1c !important; border-color: #fecaca !important; }
+.grade-select[data-grade="Н"], .grade-badge[data-grade="Н"] { background: #f8fafc !important; color: #64748b !important; border: 2px dashed #e2e8f0 !important; }
+.grade-select[data-grade=""], .grade-badge[data-grade=""] { color: #cbd5e1; background: transparent; border: 1px solid transparent; }
 
+.grade-select option {
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.grade-table button { display: none; }
+
+.table-summary-bar {
+    display: flex; gap: 24px; background: #f8fafc; padding: 12px 20px;
+    border-radius: 8px; margin-top: 16px; font-size: 13px; color: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+.table-summary-bar strong { color: #0f172a; }
+
+.table-wrap::-webkit-scrollbar { height: 6px; }
+.table-wrap::-webkit-scrollbar-track { background: #f1f5f9; }
+.table-wrap::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 3px; }
 </style>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.grade-select').forEach(function(select) {
+        select.setAttribute('data-grade', select.value);
+    });
+});
+</script>
 {% endblock %}

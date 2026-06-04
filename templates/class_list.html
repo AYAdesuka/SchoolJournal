@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="selection-container" style="max-width: 700px; margin: 40px auto; padding: 20px; font-family: 'Inter', sans-serif;">
+    <h2 style="color: #0f172a; margin-bottom: 8px;">Добро пожаловать в электронный журнал</h2>
+    <p style="color: #64748b; margin-bottom: 24px;">Выберите предмет и класс для начала работы:</p>
+    
+    <div class="journal-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+        {% for item in teacher_load %}
+            <a href="{% url 'main:class_gradebook' item.school_class.id %}?subject={{ item.subject.id }}" 
+               class="journal-card" 
+               style="display: flex; flex-direction: column; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; background: #f8fafc; transition: all 0.2s;">
+                <span style="font-size: 18px; font-weight: 700; color: #0f172a;">{{ item.subject.subject_name }}</span>
+                <span style="font-size: 14px; color: #475569; margin-top: 4px;">Класс: <strong>{{ item.school_class.class_name }}</strong></span>
+            </a>
+        {% empty %}
+            <p style="color: #64748b;">У вас пока нет запланированных уроков в журнале успеваемости.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.journal-card:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+    background: #ffffff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+</style>
+{% endblock %}

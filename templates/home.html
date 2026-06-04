@@ -3,26 +3,23 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="journal-home-container">
 
     <section class="hero">
         <div class="hero-content">
-            <span class="hero-label">
-                Электронный школьный журнал
-            </span>
+            <span class="hero-label">Электронный школьный журнал</span>
             <h1>SchoolJournal</h1>
             <p>
-                Удобная система для управления
-                учебным процессом, оценками,
-                расписанием и посещаемостью.
+                Современная и удобная экосистема для управления учебным процессом, оперативного контроля оценок, посещаемости и расписания.
             </p>
             <div class="hero-buttons">
-                <a href="#" class="btn">
+                <a href="#" class="btn btn-primary">
                     Перейти к классам
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
                 {% if not user.is_authenticated %}
                     <a href="{% url 'accounts:login' %}" class="btn btn-light">
-                        Войти
+                        Войти в систему
                     </a>
                 {% endif %}
             </div>
@@ -32,16 +29,33 @@
     <section class="statistics">
         <div class="stats-container">
             <div class="stat-card">
-                <div class="stat-number">{{ students_count|default:0 }}</div>
-                <div class="stat-label">Учеников всего</div>
+                <div class="stat-icon-wrapper students-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ students_count|default:0 }}</span>
+                    <span class="stat-label">Учеников всего</span>
+                </div>
             </div>
+
             <div class="stat-card">
-                <div class="stat-number">{{ classes_count|default:0 }}</div>
-                <div class="stat-label">Классов</div>
+                <div class="stat-icon-wrapper classes-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ classes_count|default:0 }}</span>
+                    <span class="stat-label">Активных классов</span>
+                </div>
             </div>
+
             <div class="stat-card">
-                <div class="stat-number">{{ teachers_count|default:0 }}</div>
-                <div class="stat-label">Учителей</div>
+                <div class="stat-icon-wrapper teachers-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ teachers_count|default:0 }}</span>
+                    <span class="stat-label">Преподавателей</span>
+                </div>
             </div>
         </div>
     </section>
@@ -50,179 +64,244 @@
         <div class="feature-card">
             <div class="feature-icon">📚</div>
             <h3>Электронный журнал</h3>
-            <p>
-                Ведение оценок, посещаемости
-                и успеваемости учеников.
-            </p>
+            <p>Выставление оценок в один клик, удобный контроль пропусков («Н») и автоматический расчет статистики успеваемости.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">👨‍🏫</div>
             <h3>Для учителей</h3>
-            <p>
-                Быстрое управление классами
-                и учебным процессом.
-            </p>
+            <p>Быстрое переключение между предметами, фильтрация по учебным периодам и мгновенное сохранение изменений в базе.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">🎓</div>
             <h3>Для учеников</h3>
-            <p>
-                Доступ к расписанию,
-                заданиям и результатам.
-            </p>
+            <p>Удобный и прозрачный доступ к текущим результатам, расписанию уроков, комментариям преподавателей и домашним заданиям.</p>
         </div>
-    </section>
+    </</section>
 
 </div>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+.journal-home-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    color: #334155;
+}
+
+/* --- Секция Hero --- */
 .hero {
-    padding: 100px 0 80px;
+    padding: 80px 0 60px;
     text-align: center;
 }
 
 .hero-content {
-    max-width: 800px;
+    max-width: 760px;
     margin: 0 auto;
 }
 
 .hero-label {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 30px;
-    background: #e9eefc;
-    color: #3b5bcc;
-    font-size: 14px;
-    margin-bottom: 20px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .hero h1 {
-    font-size: 64px;
-    color: #1c2b4a;
-    margin-bottom: 20px;
+    font-size: 56px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 20px 0;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
 }
 
 .hero p {
     font-size: 18px;
-    line-height: 1.7;
-    color: #555;
-    max-width: 650px;
+    line-height: 1.6;
+    color: #64748b;
     margin: 0 auto 35px;
 }
 
 .hero-buttons {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
     flex-wrap: wrap;
+}
+
+/* Универсальные стили кнопок */
+.btn {
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background: #0f172a;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.btn-primary:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
 }
 
 .btn-light {
-    background: white;
-    border: 1px solid #dbe2f0;
-    color: #222;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
 }
 
-.features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 25px;
-    margin-bottom: 80px;
-}
-
-.feature-card {
-    background: white;
-    border-radius: 22px;
-    padding: 30px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.05);
-    transition: 0.2s ease;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-}
-
-.feature-icon {
-    font-size: 42px;
-    margin-bottom: 20px;
-}
-
-.feature-card h3 {
-    margin-bottom: 15px;
-    color: #1c2b4a;
-}
-
-.feature-card p {
-    color: #666;
-    line-height: 1.6;
-}
-
-.statistics {
-    padding: 60px 0;
+.btn-light:hover {
     background: #f8fafc;
-    margin-bottom: 40px;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+/* --- Секция статистики (Новый плиточный вид) --- */
+.statistics {
+    margin-bottom: 60px;
 }
 
 .stats-container {
-    display: flex;
-    justify-content: center;
-    gap: 60px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
 .stat-card {
-    text-align: center;
-    background: white;
-    padding: 28px 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    min-width: 180px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.stat-icon-wrapper {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.students-icon { background: #ecfdf5; color: #059669; }
+.classes-icon { background: #eff6ff; color: #2563eb; }
+.teachers-icon { background: #fef3c7; color: #d97706; }
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
 }
 
 .stat-number {
-    font-size: 42px;
+    font-size: 28px;
     font-weight: 700;
-    color: #1e40af;
-    margin-bottom: 8px;
+    color: #0f172a;
+    line-height: 1.2;
 }
 
 .stat-label {
-    font-size: 1.05rem;
-    color: #555;
+    font-size: 13px;
+    color: #64748b;
     font-weight: 500;
 }
 
-@media (max-width: 768px) {
+/* --- Секция возможностей --- */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 60px;
+}
 
-    .hero {
-        padding: 70px 0 50px;
-    }
+.feature-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+}
 
-    .hero h1 {
-        font-size: 42px;
-    }
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
 
-    .hero p {
-        font-size: 16px;
-    }
+.feature-icon {
+    font-size: 36px;
+    margin-bottom: 16px;
+    display: inline-block;
+}
 
+.feature-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+}
+
+.feature-card p {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- Адаптивность для мобильных устройств --- */
+@media (max-width: 900px) {
     .stats-container {
-        gap: 30px;
-    }
-
-    .stat-card {
-        padding: 22px 30px;
-        min-width: 150px;
-    }
-
-    .stat-number {
-        font-size: 36px;
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 }
 
+@media (max-width: 768px) {
+    .hero {
+        padding: 50px 0 40px;
+    }
 
+    .hero h1 {
+        font-size: 38px;
+        letter-spacing: -1px;
+    }
+
+    .hero p {
+        font-size: 15px;
+        margin-bottom: 25px;
+    }
+
+    .feature-card {
+        padding: 24px;
+    }
+}
 </style>
 {% endblock %}
