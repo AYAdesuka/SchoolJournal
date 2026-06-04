@@ -114,7 +114,6 @@
 
                             {% for lesson in lessons %}
                                 <td class="grade-cell">
-                                    {# Формируем строковый ключ для поиска в grade_map (напр. "5_12") #}
                                     {% with student_id=enrollment.student.id|stringformat:"s" lesson_id=lesson.id|stringformat:"s" %}
                                         {% with key=student_id|add:"_"|add:lesson_id %}
                                             {% with current_cell_grade=grade_map|get_item:key %}
@@ -217,7 +216,6 @@
     color: #b45309;
 }
 
-/* Скроллбар для всей страницы, если контента много */
 .journal-main-content::-webkit-scrollbar {
     width: 6px;
 }
@@ -226,7 +224,6 @@
     border-radius: 3px;
 }
 
-/* Общие стили макета */
 .header-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
 .class-selector label { font-size: 16px; color: #000; margin-right: 8px; }
 .class-selector select {

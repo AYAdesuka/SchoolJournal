@@ -4,6 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 from django.db.models import Q
 from datetime import date
+from .forms import SubjectForm
+
 
 from accounts.models import CustomUser
 from journal.models import SchoolClass, Enrollment, GradeBook, Grade, Subject, Schedule
@@ -12,7 +14,7 @@ def home(request):
     school_class = SchoolClass.objects.first()
     context = {
         'school_class': school_class,
-        'students_count': CustomUser.objects.filter(role='студент').count(),
+        'students_count': CustomUser.objects.count(),
         'classes_count': SchoolClass.objects.count(),
         'teachers_count': CustomUser.objects.filter(role='учитель').count(),
     }
@@ -84,6 +86,7 @@ def class_gradebook(request, class_id=None):
         avg_grade = 0.0
 
     context = {
+
         'my_classes': my_classes,
         'school_class': school_class,
         'enrollments': enrollments,
@@ -225,3 +228,48 @@ def delete_student(request, class_id, student_id):
     if request.method == 'POST':
         Enrollment.objects.filter(school_class=school_class, student_id=student_id).delete()
     return redirect('main:class_settings', class_id=class_id)
+
+
+@login_required
+def add_subject(request):
+    if request.user.role not in ['teacher', 'учитель', 'admin']:
+        messages.error(request, 'У вас нет прав для добавления предметов')
+        return redirect('main:gradebook')
+
+    if request.method == 'POST':
+        form = SubjectForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Предмет успешно добавлен')
+            return redirect('main:gradebook')
+    else:
+        form = SubjectForm()
+
+    return render(request, 'add_subject.html', {'form': form})
+
+
+@login_required
+def add_subject_to_class(request, class_id):
+    if request.user.role not in ['teacher', 'учитель', 'admin']:
+        messages.error(request, 'У вас нет прав для добавления предметов')
+        return redirect('main:gradebook')
+
+    school_class = get_object_or_404(SchoolClass, id=class_id)
+
+    if request.method == 'POST':
+        form = SubjectForm(request.POST)
+        if form.is_valid():
+            subject = form.save()
+            # Создаем журнал успеваемости для этого класса и предмета
+            GradeBook.objects.create(
+                school_class=school_class,
+                subject=subject,
+                teacher=request.user,
+                lesson_number=1
+            )
+            messages.success(request, f'Предмет "{subject.subject_name}" добавлен в класс {school_class.class_name}')
+            return redirect('main:class_gradebook', class_id=class_id)
+    else:
+        form = SubjectForm()
+
+    return render(request, 'add_subject.html', {'form': form, 'school_class': school_class})

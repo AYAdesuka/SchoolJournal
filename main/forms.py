@@ -2,7 +2,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 import re
-from .models import CustomUser
+from accounts.models import CustomUser
+from journal.models import Subject
+
 
 class RegistrationForm(UserCreationForm):
     full_name = forms.CharField(label = 'ФИО', max_length = 150)
@@ -50,3 +52,16 @@ class RegistrationForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label='Логин', max_length=150)
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
+
+
+class SubjectForm(forms.ModelForm):
+    class Meta:
+        model = Subject
+        fields = ['subject_name', 'short_name', 'description', 'hours_per_year', 'is_required']
+        widgets = {
+            'subject_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Например: Математика'}),
+            'short_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Например: Мат'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'hours_per_year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'is_required': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
